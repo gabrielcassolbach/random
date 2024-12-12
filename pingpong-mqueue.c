@@ -9,6 +9,7 @@
 #warning Este codigo foi planejado para ambientes UNIX (LInux, *BSD, MacOS). A compilacao e execucao em outros ambientes e responsabilidade do usuario.
 #endif
 
+
 task_t prod[3], somador, cons[2] ;
 mqueue_t queueValores, queueRaizes ;
 

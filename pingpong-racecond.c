@@ -10,6 +10,7 @@
 
 #define NUMTASKS 133
 #define NUMSTEPS 39373
+#define DEBUG
 
 task_t task[NUMTASKS] ;
 semaphore_t  s ;
@@ -59,6 +60,7 @@ int main (int argc, char *argv[])
      //printf("\nCreating %s", task_name);
      task_create (&task[i], (void (*))taskBody, task_name);
    }
+
    printf ("\n[%06d] %d tarefas criadas e somando %d vezes cada, aguarde...\n", systime(), NUMTASKS, NUMSTEPS);
    fflush(stdout);
 
