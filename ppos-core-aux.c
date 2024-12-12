@@ -17,7 +17,7 @@ int sem_create (semaphore_t *s, int value) {
 	s->semaphore_q = NULL;
 	s->counter = value;
     PPOS_PREEMPT_ENABLE
-	return (s->counter == value) - 1;		
+	return (s->counter == value) - 1;		    
 }
 
 int sem_down (semaphore_t *s) {
@@ -27,20 +27,18 @@ int sem_down (semaphore_t *s) {
 	if(s->counter < 0) {
 		queue_append((queue_t **) &(s->semaphore_q), (queue_t*) taskExec);
         task_suspend(taskExec, &sleepQueue ) ;	
-        task_yield();	
-        PPOS_PREEMPT_ENABLE
+        task_yield();
     }
+    PPOS_PREEMPT_ENABLE
 	return 0;	
 }
 
 int sem_up (semaphore_t *s) {
 	if(s == NULL) return -1;
-    PPOS_PREEMPT_DISABLE
 	s->counter++;
-	if(s->counter >= 0) {
-        //queue_t* u = queue_remove((queue_t **) &(s->semaphore_q), (queue_t *) s->semaphore_q); 
-        //queue_append((queue_t **) &readyQueue, u); 	  
-        task_resume((task_t*) s->semaphore_q);      
+	if(s->counter <= 0) {
+        queue_t* u = queue_remove((queue_t **) &(s->semaphore_q), (queue_t *) s->semaphore_q); 
+        task_resume((task_t*)u);  
     }
 	return 0;
 }
@@ -48,10 +46,11 @@ int sem_up (semaphore_t *s) {
 int sem_destroy (semaphore_t *s) {
 	if(s == NULL) return -1;
     PPOS_PREEMPT_DISABLE
-	while(queue_size(s->semaphore_q)) {
+    int counter = queue_size((queue_t *) s->semaphore_q);
+	while(counter--) {
 		queue_t* u = queue_remove((queue_t **) &(s->semaphore_q), (queue_t *) s->semaphore_q); 
-		queue_append((queue_t **) &readyQueue, u); 	
-	}
+        task_resume((task_t*)u);  
+    }
     PPOS_PREEMPT_ENABLE
 	return (s->semaphore_q == NULL) - 1;	
 }

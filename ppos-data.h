@@ -33,7 +33,7 @@ typedef struct task_t
 
 // estrutura que define um semáforo
 typedef struct {
-	queue_t* semaphore_q;
+	struct task_t* semaphore_q;
 	int counter;    
 } semaphore_t ;
 
